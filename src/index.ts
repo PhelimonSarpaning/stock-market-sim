@@ -11,6 +11,7 @@ import { Logger } from "./util/Logger";
 dotenv.config();
 
 import * as apiV1 from "./routes/v1";
+import { MarketTrendService, ProbabilityService, SectorTrendService } from "./services";
 
 /**
  * Create Express Server
@@ -61,6 +62,36 @@ mongoose.connect(process.env.MONGOLAB_URI, {
 
 (mongoose as any).Promise = global.Promise; // Use global promises for mongoose
 
+// const m = GlobalDI.get<MarketTrendService>("MarketTrendService");
+// const d = m.initializeDeck(14);
+// const p = GlobalDI.get<ProbabilityService>("ProbabilityService");
+// console.log(p.pickFromDeck(d));
+// console.log(m.getScore(d));
+// console.log(d);
+// console.log(m.getScore(d));
+// console.log(d);
+// console.log(m.getScore(d));
+// console.log(d);
+// console.log(m.getScore(d));
+// console.log(d);
+// const s = GlobalDI.get<SectorTrendService>("SectorTrendService");
+// const d = s.initializeDeck(10, ["Tech", "Marketing"]);
+// console.log(s.getScore(d));
+// console.log(s.getScore(d));
+// console.log(s.getScore(d));
+// console.log(s.getScore(d));
+// console.log(s.getScore(d));
+// console.log(s.getScore(d));
+// console.log(s.getScore(d));
+// console.log(s.getScore(d));
+// console.log(s.getScore(d));
+// console.log(s.getScore(d));
+// console.log(d);
+// console.log(s.getScore(d));
+// console.log(d);
+// console.log(s.getScore(d));
+
+// console.log(d);
 /**
  * API v1 Routes
  */
