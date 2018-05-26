@@ -19,6 +19,7 @@
     "@types/express": "^4.11.0",
     "@types/jsonwebtoken": "^7.2.5",
     "@types/mongoose": "^4.7.29",
+    "@types/shuffle-array": "0.0.28",
     "@types/winston": "^2.3.7",
     "nodemon": "^1.14.1",
     "nyc": "^11.2.1",
@@ -36,6 +37,7 @@
     "jsonwebtoken": "^8.1.1",
     "mongoose": "^4.12.3",
     "reflect-metadata": "^0.1.10",
+    "shuffle-array": "^1.0.1",
     "winston": "^2.4.0"
   }
 }
