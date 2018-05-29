@@ -4,19 +4,19 @@ import * as shuffle from "shuffle-array";
 @injectable()
 export class ProbabilityService {
 
-  public getValue(weights: Map<string, number>, occurences: Map<string, boolean>) {
-    // const occurenceCount = new Map<string, number>();
-    // occurences.forEach((value, key) => {
-    //   if (weights.has(key) && value) {
-    //     if (occurenceCount.has(key)) {
-    //       occurenceCount.set(key, occurenceCount.get(key) + 1);
-    //     } else {
-    //       occurenceCount.set(key, 1);
-    //     }
-    //   }
-    // });
-    //
-  }
+  // public getValue(weights: Map<string, number>, occurences: Map<string, boolean>) {
+  //   // const occurenceCount = new Map<string, number>();
+  //   // occurences.forEach((value, key) => {
+  //   //   if (weights.has(key) && value) {
+  //   //     if (occurenceCount.has(key)) {
+  //   //       occurenceCount.set(key, occurenceCount.get(key) + 1);
+  //   //     } else {
+  //   //       occurenceCount.set(key, 1);
+  //   //     }
+  //   //   }
+  //   // });
+  //   //
+  // }
 
   public generateDeck(weights: Map<string, number>, rounds: number) {
     let deck: string[] = [];
@@ -34,7 +34,7 @@ export class ProbabilityService {
     return deck;
   }
 
-  public pickFromDeck(deck: string[]) {
+  public pickFromDeck(deck: string[] | number[]) {
     const elemIndex = Math.ceil(Math.random() * 10000) % deck.length;
     // console.log(elemIndex)
     return deck[elemIndex];
@@ -58,4 +58,5 @@ export class ProbabilityService {
       return false;
     }
   }
+
 }
