@@ -3,7 +3,7 @@ import { Config } from "../util/Config";
 import { ProbabilityService } from "./ProbabilityService";
 
 @injectable()
-export class MarketTrendService {
+export class MarketTrendsService {
   constructor(
     @inject("ProbabilityService") private probabilityService: ProbabilityService,
   ) { }
