@@ -7,4 +7,6 @@ export class Stock {
   public price: number;
   public round: number;
   public randomTrend: number;
+  public event: string;
+  public eventValue: number;
 }

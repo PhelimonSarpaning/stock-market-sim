@@ -1,4 +1,5 @@
 import { inject, injectable } from "inversify";
+import { Round } from "../../models";
 import { Game } from "../../models/Game";
 import { GameBuilder } from "../../util/GameBuilder";
 import { GameSchema } from "../schema/GameSchema";
@@ -30,11 +31,31 @@ export class GameDAO {
   }
 
   public updateGameRound(gameId: string, round: number) {
-    return GameSchema.updateOne({ id: gameId}, {currentRound: round}).then((result) => {
+    return GameSchema.updateOne({ _id: gameId}, {currentRound: round}).then((result) => {
       if (result) {
         return true;
       } else {
-        return false;
+        throw new Error("Round didn't shift");
+      }
+    }).catch((err) => {
+      return err;
+    });
+  }
+
+  public getCurrentRoundStock(gameId: string): Promise<Round> {
+    return GameSchema.findById(gameId).then((res) => {
+      let game: Game;
+      let currentRound: Round;
+      if (res) {
+         game = this.gameBuilder.buildFromSchema(res);
+         game.rounds.forEach((round) => {
+           if (round.roundNo === game.currentRound) {
+              currentRound = round;
+           }
+         });
+         return currentRound;
+      } else {
+        throw new Error("Current round stock details not found");
       }
     }).catch((err) => {
       return err;

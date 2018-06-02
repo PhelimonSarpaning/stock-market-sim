@@ -23,4 +23,5 @@ export enum Config {
   EventsStockTakeoverWeight = 1,
   EventsStockScandalWeight = 1,
   Rounds = 20,
+  InitialStockPrice = 100,
 }

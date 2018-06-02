@@ -1,5 +1,6 @@
 import { inject, injectable } from "inversify";
 import { ProbabilityService } from ".";
+import { IEvent } from "../models/IEvent";
 import { Config } from "../util/Config";
 
 @injectable()
@@ -11,7 +12,15 @@ export class MarketEventsService {
   // Probability here depends on each turn i.e. 0.33 and 0.67 every turn as probaility for event itself
   // is given (i.e. increases by 0.1 each turn )
   // In Trends the probability is calculated over the entire game i.e. 0.25 0.25 0.5 will be the average for entire game
-  public getEvent(noOfRoundsSincePreviousEvent: number) {
+  public getEvent(noOfRoundsSincePreviousEvent: number, stocksSectorMap: Map<string, string[]>): IEvent {
+    // const sectors = Object.keys(stocksSectorMap);
+    const sectors = [...stocksSectorMap.keys()];
+    const stocks: string[] = [];
+    stocksSectorMap.forEach((stockList, sector) => {
+      stockList.forEach((stock) => {
+        stocks.push(stock);
+      });
+    });
     const eventDeck = this.initializeEventDeck(noOfRoundsSincePreviousEvent);
     const typeOfEventDeck = this.initializeTypeOfEventDeck();
     const event = this.probabilityService.pickFromDeck(eventDeck);
@@ -22,14 +31,19 @@ export class MarketEventsService {
         this.probabilityService.removeFromDeck(typeOfEventDeck, Config.SectorString);
         const sectorEventDeck = this.initializeSectorEventDeck();
         const sectorEvent = this.probabilityService.pickFromDeck(sectorEventDeck);
+        const eventEntity: string = String(this.probabilityService.pickFromDeck(sectors));
         if (sectorEvent === Config.Boom) {
           return {
-            name: Config.Boom,
+            entity: eventEntity,
+            name: Config.Boom.toString(),
+            type: "sector",
             value: (+1) * Number(this.probabilityService.pickFromDeck([1, 2, 3, 4, 5])),
           };
         } else if (sectorEvent === Config.Bust) {
           return {
-            name: Config.Bust,
+            entity: eventEntity,
+            name: Config.Bust.toString(),
+            type: "sector",
             value: (-1) * Number(this.probabilityService.pickFromDeck([1, 2, 3, 4, 5])),
           };
         }
@@ -38,19 +52,26 @@ export class MarketEventsService {
         this.probabilityService.removeFromDeck(typeOfEventDeck, Config.StockString);
         const stockEventDeck = this.initializeStockEventDeck();
         const stockEvent = this.probabilityService.pickFromDeck(stockEventDeck);
+        const eventEntity: string = String(this.probabilityService.pickFromDeck(stocks));
         if (stockEvent === Config.ProfitWarning) {
           return {
-            name: Config.ProfitWarning,
+            entity: eventEntity,
+            name: Config.ProfitWarning.toString(),
+            type: "stock",
             value: (+1) * Number(this.probabilityService.pickFromDeck([2, 3])),
           };
         } else if (stockEvent === Config.Takeover) {
           return {
-            name: Config.Takeover,
+            entity: eventEntity,
+            name: Config.Takeover.toString(),
+            type: "stock",
             value: (-1) * Number(this.probabilityService.pickFromDeck([1, 2, 3, 4, 5])),
           };
         } else if (stockEvent === Config.Scandal) {
           return {
-            name: Config.Scandal,
+            entity: eventEntity,
+            name: Config.Scandal.toString(),
+            type: "stock",
             value: (-1) * Number(this.probabilityService.pickFromDeck([3, 4, 5, 6])),
           };
         }
