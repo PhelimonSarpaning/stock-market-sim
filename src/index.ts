@@ -11,7 +11,7 @@ import { Logger } from "./util/Logger";
 dotenv.config();
 
 import * as apiV1 from "./routes/v1";
-import { MarketTrendService, ProbabilityService, SectorTrendService } from "./services";
+import { MarketTrendsService, ProbabilityService, SectorTrendsService } from "./services";
 
 /**
  * Create Express Server
