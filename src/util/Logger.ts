@@ -21,13 +21,13 @@ export class Logger {
           timestamp: true,
         }),
         new winston.transports.File({
-          filename: "logs/debug.log",
+          filename: "./debug.log",
           level: "debug",
           name: "Debug Log",
           timestamp: true,
         }),
         new winston.transports.File({
-          filename: "logs/all.log",
+          filename: ".//all.log",
           level: "silly",
           maxsize: 10000000, // 10MB
           name: "All Log",
@@ -35,7 +35,7 @@ export class Logger {
           zippedArchive: true,
         }),
         new winston.transports.File({
-          filename: "logs/error.log",
+          filename: "./error.log",
           level: "error",
           maxsize: 10000000, // 10MB
           name: "Error Log",
