@@ -56,9 +56,28 @@ export class GameController {
     this.gameService.getAnalystEvents(gameId).then((result) => {
       const resultObject: any = {};
       result.forEach((value, key, map) => {
+        delete value.value;
         resultObject[key] = value;
       });
       res.status(200).json(resultObject);
+    }).catch((err) => {
+      this.logger.error(err);
+      return res.status(500).json(err.message);
+    });
+  }
+
+  public getAnalystTrends(req: IRequest, res: Response, next: NextFunction) {
+    const gameId = req.params.id;
+    if (!gameId) {
+      return res.status(400).json({ err: "Game ID not found" });
+    }
+    this.gameService.getAnalystTrends(gameId).then((result) => {
+      // const resultObject: any = {};
+      // result.forEach((value, key, map) => {
+      //   // delete value.value;
+      //   resultObject[key] = value;
+      // });
+      res.status(200).json(result);
     }).catch((err) => {
       this.logger.error(err);
       return res.status(500).json(err.message);

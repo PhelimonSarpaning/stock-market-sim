@@ -75,7 +75,7 @@ export class GameService {
    * @param gameId
    * @returns returns a roundNo,EventString Map containing the event details for future rounds
    */
-  public getAnalystEvents(gameId: string): Promise<Map<number, string>> {
+  public getAnalystEvents(gameId: string): Promise<Map<number, any>> {
     return this.gameDAO.getGameById(gameId).then((game) => {
       const maxRounds = game.currentRound + 3;
       const analystRounds: Round[] = [];
@@ -89,6 +89,46 @@ export class GameService {
         }
       });
       return roundEventsMap;
+    }).catch((err) => {
+      return err;
+    });
+  }
+
+  public getAnalystTrends(gameId: string): Promise<Map<number, any>> {
+    return this.gameDAO.getGameById(gameId).then((game) => {
+      const maxRounds = game.currentRound + 10;
+      const analystRounds: Round[] = [];
+      const roundTrendsMap = new Map<number, any>();
+      let trendToDisplay: string;
+      const pick = this.probabilityService.pickFromDeck(["sector", "stock"]);
+      // console.log(Object.keys(game.rounds[0].sectorTrends));
+      // console.log(game.rounds[0].sectorTrends.keys());
+      if (pick === "sector") {
+        // console.log(game.rounds[0].sectorTrends);
+        // console.log(game.rounds[0].sectorTrends.keys());
+        const sectors = [...game.rounds[0].sectorTrends.keys()];
+        trendToDisplay = String(this.probabilityService.pickFromDeck(sectors));
+        game.rounds.forEach((round) => {
+          if (round.roundNo > game.currentRound && round.roundNo <= maxRounds) {
+              roundTrendsMap.set(round.roundNo, round.sectorTrends.get(trendToDisplay));
+          }
+        });
+      } else if (pick === "stock") {
+        const stocks: string[] = [];
+        game.rounds[0].stock.forEach((stock) => {
+          stocks.push(stock.company);
+        });
+        trendToDisplay = String(this.probabilityService.pickFromDeck(stocks));
+        game.rounds.forEach((round) => {
+          if (round.roundNo > game.currentRound && round.roundNo <= maxRounds) {
+              roundTrendsMap.set(round.roundNo, round.sectorTrends.get(trendToDisplay));
+          }
+        });
+      }
+      return {
+        entity: trendToDisplay,
+        trends: roundTrendsMap,
+      };
     }).catch((err) => {
       return err;
     });

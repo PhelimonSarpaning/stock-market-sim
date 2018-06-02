@@ -27,6 +27,10 @@ router.get("/events/:id", (req: IRequest, res: Response, next: NextFunction) => 
   gameController.getAnalystEvents(req, res, next);
 });
 
+router.get("/trends/:id", (req: IRequest, res: Response, next: NextFunction) => {
+  gameController.getAnalystTrends(req, res, next);
+});
+
 router.get("/clock/:id", (req: IRequest, res: Response, next: NextFunction) => {
   gameController.getGameClock(req, res, next);
 });
