@@ -6,7 +6,7 @@ export class Round {
   public stock: Stock[];
   public event: any;
   public roundNo: number;
-  public sectorTrends: Map<string, number>;
+  public sectorTrends: Map<string, number> | any;
   public marketTrend: number;
   public eventDuration: number;
 }

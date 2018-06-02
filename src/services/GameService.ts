@@ -101,16 +101,12 @@ export class GameService {
       const roundTrendsMap = new Map<number, any>();
       let trendToDisplay: string;
       const pick = this.probabilityService.pickFromDeck(["sector", "stock"]);
-      // console.log(Object.keys(game.rounds[0].sectorTrends));
-      // console.log(game.rounds[0].sectorTrends.keys());
       if (pick === "sector") {
-        // console.log(game.rounds[0].sectorTrends);
-        // console.log(game.rounds[0].sectorTrends.keys());
-        const sectors = [...game.rounds[0].sectorTrends.keys()];
+        const sectors = Object.keys(game.rounds[0].sectorTrends);
         trendToDisplay = String(this.probabilityService.pickFromDeck(sectors));
         game.rounds.forEach((round) => {
           if (round.roundNo > game.currentRound && round.roundNo <= maxRounds) {
-              roundTrendsMap.set(round.roundNo, round.sectorTrends.get(trendToDisplay));
+              roundTrendsMap.set(round.roundNo, round.sectorTrends[trendToDisplay]);
           }
         });
       } else if (pick === "stock") {
@@ -121,13 +117,21 @@ export class GameService {
         trendToDisplay = String(this.probabilityService.pickFromDeck(stocks));
         game.rounds.forEach((round) => {
           if (round.roundNo > game.currentRound && round.roundNo <= maxRounds) {
-              roundTrendsMap.set(round.roundNo, round.sectorTrends.get(trendToDisplay));
+            round.stock.forEach((stock) => {
+              if (stock.company === trendToDisplay) {
+                roundTrendsMap.set(round.roundNo, stock.randomTrend);
+              }
+            });
           }
         });
       }
+      const roundTrends: any = {};
+      roundTrendsMap.forEach((value, key) => {
+        roundTrends[key] = value;
+      });
       return {
         entity: trendToDisplay,
-        trends: roundTrendsMap,
+        trends: roundTrends,
       };
     }).catch((err) => {
       return err;
