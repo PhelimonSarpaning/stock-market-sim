@@ -125,14 +125,20 @@ export class GameService {
           }
         });
       }
-      const roundTrends: any = {};
-      roundTrendsMap.forEach((value, key) => {
-        roundTrends[key] = value;
+      const resultArr: any = [];
+      roundTrendsMap.forEach((val, key, map) => {
+        resultArr.push({
+          entity: trendToDisplay,
+          round: key,
+          type: pick,
+          value: val,
+        });
       });
-      return {
-        entity: trendToDisplay,
-        trends: roundTrends,
-      };
+      return resultArr;
+      // return {
+      //   entity: trendToDisplay,
+      //   trends: roundTrends,
+      // };
     }).catch((err) => {
       return err;
     });

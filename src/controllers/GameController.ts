@@ -54,12 +54,18 @@ export class GameController {
       return res.status(400).json({ err: "Game ID not found" });
     }
     this.gameService.getAnalystEvents(gameId).then((result) => {
-      const resultObject: any = {};
+      // const resultObject: any = {};
+      // result.forEach((value, key, map) => {
+      //   delete value.value;
+      //   resultObject[key] = value;
+      // });
+      const resultArr: any = [];
       result.forEach((value, key, map) => {
         delete value.value;
-        resultObject[key] = value;
+        value.round = key;
+        resultArr.push(value);
       });
-      res.status(200).json(resultObject);
+      res.status(200).json(resultArr);
     }).catch((err) => {
       this.logger.error(err);
       return res.status(500).json(err.message);
