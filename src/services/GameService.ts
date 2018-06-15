@@ -126,10 +126,12 @@ export class GameService {
         });
       }
       const resultArr: any = [];
+      const stocksSectorMap = this.stockSectorMap(game.rounds[0].stock);
       roundTrendsMap.forEach((val, key, map) => {
         resultArr.push({
           entity: trendToDisplay,
           round: key,
+          sector: pick === "stock" ? stocksSectorMap.get(trendToDisplay) : undefined,
           type: pick,
           value: val,
         });
@@ -183,6 +185,14 @@ export class GameService {
     }).catch((err) => {
       return err;
     });
+  }
+
+  private stockSectorMap(stocks: Stock[]) {
+    const stocksSectorMap = new Map<string, string>();
+    stocks.forEach((stock) => {
+      stocksSectorMap.set(stock.company, stock.sector);
+    });
+    return stocksSectorMap;
   }
 
   private calculateStockPrice(price: number) {
