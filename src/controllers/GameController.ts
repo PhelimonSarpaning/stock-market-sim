@@ -141,4 +141,17 @@ export class GameController {
       return res.status(500).json(err.message);
     });
   }
+
+  public getStockSectorMapping(req: IRequest, res: Response, next: NextFunction) {
+    const gameId = req.query.id;
+    if (!gameId) {
+      return res.status(400).json({ err: "Game ID not found" });
+    }
+    this.gameService.getStocksSectorMapping(gameId).then((result) => {
+      res.status(200).json(result);
+    }).catch((err) => {
+      this.logger.error(err);
+      return res.status(500).json(err.message);
+    });
+  }
 }

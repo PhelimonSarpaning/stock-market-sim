@@ -15,6 +15,10 @@ const gameSchema = new Mongoose.Schema({
     required: true,
     type: Mongoose.Schema.Types.Mixed,
   },
+  sectorsCompanyMap: {
+    required: true,
+    type: Mongoose.Schema.Types.Mixed,
+  },
 });
 
 const GameSchema = Mongoose.model<IGameSchemaModel>("Game", gameSchema);
