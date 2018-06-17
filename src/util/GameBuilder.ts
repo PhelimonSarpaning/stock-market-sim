@@ -11,6 +11,7 @@ export class GameBuilder {
     game.name = gameSchema.name;
     game.currentRound = gameSchema.currentRound;
     game.rounds = gameSchema.rounds;
+    game.sectorsCompanyMap = gameSchema.sectorsCompanyMap;
     return game;
   }
 }

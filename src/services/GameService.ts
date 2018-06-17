@@ -20,9 +20,18 @@ export class GameService {
     @inject("GameDAO") private gameDAO: GameDAO,
   ) { }
 
+  /**
+   * @param gameName takes the game name as parameter, whoever it isn't treated as a unique ID
+   * @returns prepared round object, without the round event values
+   */
   public startGame(gameName: string): Promise<any> {
     const game = GlobalDI.get<Game>("Game");
-    game.rounds = this.initializeGameSimulation();
+    const sectors = ["Technology", "Business"];
+    const stocksSectorMap = new Map<string, string[]>();
+    stocksSectorMap.set(sectors[0], ["99X", "Virtusa", "WSO2"]);
+    stocksSectorMap.set(sectors[1], ["John Keells", "Cargills"]);
+    game.sectorsCompanyMap = stocksSectorMap;
+    game.rounds = this.initializeGameSimulation(sectors, stocksSectorMap);
     game.name = gameName;
     return this.gameDAO.save(game).then((newGame) => {
       let resObj = null;
@@ -176,12 +185,26 @@ export class GameService {
       const roundStockMap = new Map<number, number>();
       game.rounds.forEach((round) => {
         round.stock.forEach((stock) => {
-          if (stock.company === stockName) {
+          if (stock.company === stockName && round.roundNo <= game.currentRound) {
             roundStockMap.set(stock.round, stock.price);
           }
         });
       });
       return roundStockMap;
+    }).catch((err) => {
+      return err;
+    });
+  }
+
+  public getStocksSectorMapping(gameId: string): Promise<any> {
+    return this.gameDAO.getGameById(gameId).then((game) => {
+      // const resultArr: any = [];
+      // for (const key in object) {
+      //   if (object.hasOwnProperty(key)) {
+      //     const element = object[key];
+      //   }
+      // }
+      return game.sectorsCompanyMap;
     }).catch((err) => {
       return err;
     });
@@ -213,11 +236,7 @@ export class GameService {
     return stocksPriceMap;
   }
 
-  private initializeGameSimulation() {
-    const sectors = ["Technology", "Business"];
-    const stocksSectorMap = new Map<string, string[]>();
-    stocksSectorMap.set(sectors[0], ["99X", "Virtusa", "WSO2"]);
-    stocksSectorMap.set(sectors[1], ["John Keells", "Cargills"]);
+  private initializeGameSimulation(sectors: string[], stocksSectorMap: Map<string, string[]>) {
     const stocksPriceMap = this.initializeStocksPriceMap(stocksSectorMap);
     const rounds: Round[] = [];
     const marketTrendsDeck = this.marketTrendsService.initializeDeck(Config.Rounds);

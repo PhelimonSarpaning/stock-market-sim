@@ -43,4 +43,8 @@ router.get("/stock/history", (req: IRequest, res: Response, next: NextFunction) 
   gameController.getStockHistory(req, res, next);
 });
 
+router.get("/stock/details", (req: IRequest, res: Response, next: NextFunction) => {
+  gameController.getStockSectorMapping(req, res, next);
+});
+
 export { router };

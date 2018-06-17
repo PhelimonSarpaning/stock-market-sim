@@ -7,4 +7,5 @@ export class Game {
   public name: string;
   public id: string;
   public currentRound: number;
+  public sectorsCompanyMap: any;
 }
