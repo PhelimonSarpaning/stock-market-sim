@@ -1,3 +1,5 @@
+[ ![Codeship Status for murtazasmart/stock-market-sim](https://app.codeship.com/projects/d9e84da0-56c6-0136-a61e-62d37ace2b50/status?branch=master)](https://app.codeship.com/projects/294830)
+
 # Stock market simulator
 
 This application is a REST Service which enables the simulation of a stock market
