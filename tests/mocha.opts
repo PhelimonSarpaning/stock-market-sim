@@ -1,0 +1,5 @@
+--recursive
+--require source-map-support/register
+--require ts-node/register
+--watch-extensions tsx,ts
+--timeout 150000
