@@ -7,7 +7,7 @@ import { GameSchema } from "../schema/GameSchema";
 @injectable()
 export class GameDAO {
   constructor(
-    @inject("GameBuilder") private gameBuilder: GameBuilder,
+    @inject("GameBuilder") public gameBuilder: GameBuilder,
   ) { }
 
   public save(game: Game): Promise<Game> {
