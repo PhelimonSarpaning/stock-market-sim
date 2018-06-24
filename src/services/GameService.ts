@@ -26,10 +26,13 @@ export class GameService {
    */
   public startGame(gameName: string): Promise<any> {
     const game = GlobalDI.get<Game>("Game");
-    const sectors = ["Technology", "Business"];
+    const sectors = ["Technology", "Business", "Telco", "Health"];
     const stocksSectorMap = new Map<string, string[]>();
-    stocksSectorMap.set(sectors[0], ["99X", "Virtusa", "WSO2"]);
-    stocksSectorMap.set(sectors[1], ["John Keells", "Cargills"]);
+    stocksSectorMap.set(sectors[0], ["99X PLC", "Virtusa PLC", "WSO2 PLC", "IFS PLC"]);
+    stocksSectorMap.set(sectors[1], ["John Keells PLC", "Cargills PLC", "Singer Sri Lanka PLC", "Brown & Company PLC"]);
+    stocksSectorMap.set(sectors[2], ["Dialog Axiata PLC", "Mobitel PLC", "Etisalat PLC", "Airtel PLC"]);
+    stocksSectorMap.set(sectors[3], ["Hemas Holdings Hospital PLC", "Nawaloka Hospital Hospitals PLC",
+      "Durdans Hospital PLC", "Asiri Hospital Holdings PLC"]);
     game.sectorsCompanyMap = stocksSectorMap;
     game.rounds = this.initializeGameSimulation(sectors, stocksSectorMap);
     game.name = gameName;
