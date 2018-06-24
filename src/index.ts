@@ -98,4 +98,8 @@ mongoose.connect(process.env.MONGOLAB_URI, {
 
 app.use("/api/v1", apiV1.router);
 
+app.route("/").get((req, res) => {
+  res.status(200).json({ message: "Welcome, it works"});
+});
+
 export { app };
