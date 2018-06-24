@@ -5,7 +5,7 @@ import { Config } from "../util/Config";
 @injectable()
 export class SectorTrendsService {
   constructor(
-    @inject("ProbabilityService") private probabilityService: ProbabilityService,
+    @inject("ProbabilityService") public probabilityService: ProbabilityService,
   ) { }
 
   public initializeDeck(rounds: number, sectors: string[]) {

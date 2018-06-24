@@ -4,12 +4,39 @@
   "description": "This will simulate the market behavior on a turn basis.",
   "main": "./dist/server.js",
   "scripts": {
-    "test": "mocha \"./**/*.spec.ts\" || exit 0",
+    "test": "nyc mocha \"./**/*.spec.ts\" || exit 0",
     "start": "npm run build && node ./dist/server.js",
     "start:watch": "nodemon",
     "build": "npm run build-ts",
     "build-ts": "tsc",
-    "tslint": "tslint -c tslint.json -p tsconfig.json "
+    "test-integration": "mocha \"./test/integration/**/*.ts\" || exit 0",
+    "tslint": "tslint -c tslint.json -p tsconfig.json ",
+    "ci-tslint": "tslint -c tslint.json -p tsconfig.json ",
+    "tslint-fix": "tslint -c tslint.json -p tsconfig.json --fix",
+    "ci-test": "nyc mocha --reporter xunit --reporter-options output=./dist/reports/test.xml \"./**/*.spec.ts\" || exit 0"
+  },
+  "nyc": {
+    "require": [
+      "ts-node/register"
+    ],
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "**/*.d.ts",
+      "dist",
+      "coverage/**",
+      "**/*.spec.ts"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "all": true
   },
   "author": "Murtaza Anverali",
   "license": "MIT",
@@ -22,6 +49,12 @@
     "@types/mongoose": "^4.7.29",
     "@types/shuffle-array": "0.0.28",
     "@types/winston": "^2.3.7",
+    "@types/chai": "4.0.4",
+    "@types/mocha": " 2.2.44",
+    "@types/sinon": "^4.0.0",
+    "chai": "^4.1.2",
+    "sinon": "^4.1.2",
+    "mocha": "^4.0.1",
     "nodemon": "^1.14.1",
     "nyc": "^11.2.1",
     "source-map-support": "^0.5.0",
@@ -38,6 +71,7 @@
     "inversify": "^4.5.1",
     "jsonwebtoken": "^8.1.1",
     "mongoose": "^4.12.3",
+    "node-mocks-http": "^1.7.0",
     "reflect-metadata": "^0.1.10",
     "shuffle-array": "^1.0.1",
     "winston": "^2.4.0"

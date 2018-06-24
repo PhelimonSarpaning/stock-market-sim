@@ -1,4 +1,4 @@
-import { NextFunction, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { inject, injectable } from "inversify";
 import { IRequest } from "../middleware/Auth";
 import { GameService } from "../services";
@@ -11,7 +11,7 @@ export class GameController {
     @inject("Logger") private logger: Logger,
   ) { }
 
-  public createGame(req: IRequest, res: Response, next: NextFunction) {
+  public createGame(req: Request, res: Response, next: NextFunction) {
     const gameName = req.body.gameName;
     if (!gameName) {
       return res.status(400).json({ err: "Game name not found" });
