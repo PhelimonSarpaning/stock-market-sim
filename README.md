@@ -4,21 +4,39 @@
 
 This application is a REST Service which enables the simulation of a stock market
 
-The API documentation can be found here 
-
-# Technologies used
+# Prominent technologies/libraries used
  - InversifyJs - for dependency injection
- - JWT - for authentication between server and clients i.e. broker
  - Winston - for logging purposes
  - Mocha/Chai - as unit testing libraries
  - Typescript
+ - Mongodb(NoSQL) using mongoose library
+ - Sinon to stub the functions for unit testing
+ - TSLint for linting, refer below for more details
+ 
+ # Project details
+### Team name: EXIT
+### API doc link - https://docs.google.com/spreadsheets/d/1tFuveKrxBRxqtGC7-UDONrHTRYYbcqwofPyL0zMwmcE/edit#gid=0
+### Members:
+ - Murtaza Anverali Esufali 16211211
+ - Maheshi K.H.Gunaratne    16211197
+ - Rathnayake Bhagya P M    16211279
+ - Mekala Rashmika K B      16211194
+ - M.Kasun lalendra Silva   16211181
+
+| Repository Name        | Github Link           | Live URL  |
+| ------------- |-------------| -----|
+| Stock market simulator | https://github.com/murtazasmart/stock-market-sim | http://stock-market-simulator.herokuapp.com/ |
+| Stock market broker | https://github.com/murtazasmart/stock-market-broker | https://eager-babbage-836674.netlify.com |
+| Stock market broker backend | https://github.com/murtazasmart/stock-market-broker-backend | https://hidden-badlands-21838.herokuapp.com/ |
+| Stock market analyst service | https://github.com/murtazasmart/stock-market-analyst-service/ | https://stock-market-analyst.herokuapp.com |
+| Stock market bank service | https://github.com/murtazasmart/stock-market-bank-service/ | https://stock-market-bank-service.herokuapp.com/ |
+
+# Architecture
+ 
 
 # Git Workflow
 
 Master branch is the main development branch. Do not commit directly to master branch.
-Staging branch is for the staging environment which mimics production environment.
-
-**TODO: figure out who, when and how to merge to staging branch**
 
 Steps to contribute:
 
@@ -39,6 +57,11 @@ npm install
 - Build 
 ```
 npm run build
+```
+
+- Start/Run
+```
+npm run start
 ```
 
 # Folder Structure
