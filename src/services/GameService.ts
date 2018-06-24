@@ -67,6 +67,9 @@ export class GameService {
    */
   public nextRound(gameId: string): Promise<Round> {
     return this.gameDAO.getGameById(gameId).then((game) => {
+      if (!game) {
+        throw new Error("Game doesn't exist!");
+      }
       let newRound: Round = null;
       game.rounds.forEach((round) => {
         if (round.roundNo === (game.currentRound + 1)) {
@@ -89,6 +92,9 @@ export class GameService {
    */
   public getAnalystEvents(gameId: string): Promise<Map<number, any>> {
     return this.gameDAO.getGameById(gameId).then((game) => {
+      if (!game) {
+        throw new Error("Game doesn't exist!");
+      }
       const maxRounds = game.currentRound + 3;
       const analystRounds: Round[] = [];
       const roundEventsMap = new Map<number, any>();
@@ -108,6 +114,9 @@ export class GameService {
 
   public getAnalystTrends(gameId: string): Promise<Map<number, any>> {
     return this.gameDAO.getGameById(gameId).then((game) => {
+      if (!game) {
+        throw new Error("Game doesn't exist!");
+      }
       const maxRounds = game.currentRound + 10;
       const analystRounds: Round[] = [];
       const roundTrendsMap = new Map<number, any>();
@@ -118,7 +127,7 @@ export class GameService {
         trendToDisplay = String(this.probabilityService.pickFromDeck(sectors));
         game.rounds.forEach((round) => {
           if (round.roundNo > game.currentRound && round.roundNo <= maxRounds) {
-              roundTrendsMap.set(round.roundNo, round.sectorTrends[trendToDisplay]);
+            roundTrendsMap.set(round.roundNo, round.sectorTrends[trendToDisplay]);
           }
         });
       } else if (pick === "stock") {
@@ -164,6 +173,9 @@ export class GameService {
    */
   public getGameClock(gameId: string): Promise<number> {
     return this.gameDAO.getGameById(gameId).then((game) => {
+      if (!game) {
+        throw new Error("Game doesn't exist!");
+      }
       return game.currentRound;
     }).catch((err) => {
       return err;
@@ -185,6 +197,9 @@ export class GameService {
    */
   public getStockPriceHisory(gameId: string, stockName: string): Promise<Map<number, number>> {
     return this.gameDAO.getGameById(gameId).then((game) => {
+      if (!game) {
+        throw new Error("Game doesn't exist!");
+      }
       const roundStockMap = new Map<number, number>();
       game.rounds.forEach((round) => {
         round.stock.forEach((stock) => {
@@ -201,6 +216,9 @@ export class GameService {
 
   public getStocksSectorMapping(gameId: string): Promise<any> {
     return this.gameDAO.getGameById(gameId).then((game) => {
+      if (!game) {
+        throw new Error("Game doesn't exist!");
+      }
       // const resultArr: any = [];
       // for (const key in object) {
       //   if (object.hasOwnProperty(key)) {
@@ -294,7 +312,7 @@ export class GameService {
             const randomTrend = this.randomTrendsService.getScore();
             let stockPriceAlteration = 0;
             if (currentEvent && (currentEvent.entity === sector || currentEvent.entity === stockName)) {
-                stockPriceAlteration = currentEvent.value + marketTrend + sectorTrend.get(sector) + randomTrend;
+              stockPriceAlteration = currentEvent.value + marketTrend + sectorTrend.get(sector) + randomTrend;
             } else {
               stockPriceAlteration = marketTrend + sectorTrend.get(sector) + randomTrend;
             }
