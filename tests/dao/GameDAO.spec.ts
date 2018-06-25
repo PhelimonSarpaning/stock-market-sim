@@ -89,4 +89,88 @@ describe("Testing GameDAO", () => {
     });
 
   });
+
+  describe("Test sunny case", () => {
+    let sandbox: any;
+    const gameDAO = GlobalDI.get<GameDAO>("GameDAO");
+
+    beforeEach(() => {
+      sandbox = sinon.sandbox.create();
+      const gameSchemaObj = new GameSchema();
+      gameSchemaObj.rounds = [];
+      gameSchemaObj._id = "5a4489e765542405a88a0c9b";
+      gameSchemaObj.currentRound = 2;
+      gameSchemaObj.name = "ummes";
+      gameSchemaObj.sectorsCompanyMap = {};
+      sandbox.stub(GameSchema, "findById").resolves(gameSchemaObj);
+
+      const gameBuilder = GlobalDI.get<GameBuilder>("GameBuilder");
+      const game = GlobalDI.get<Game>("Game");
+      game.rounds = [];
+      game.currentRound = 2;
+      game.name = "ummes";
+      game.sectorsCompanyMap = {};
+      sandbox.stub(gameBuilder, "buildFromSchema").returns(game);
+
+    });
+
+    afterEach(() => {
+      sandbox.restore();
+    });
+
+    it("should reslove a object of type Game ", () => {
+      return gameDAO.getGameById("5a4489e765542405a88a0c9b").then((res) => {
+        expect(res).to.be.an.instanceof(Game);
+        expect(res.currentRound).to.be.equal(2);
+        expect(res.name).to.be.equal("ummes");
+      });
+    });
+  });
+
+  describe("Testing getGameById()", () => {
+
+    describe("Testing game id which doesn.t exists", () => {
+      let sandbox: any;
+      const gameDAO = GlobalDI.get<GameDAO>("GameDAO");
+
+      beforeEach(() => {
+        sandbox = sinon.sandbox.create();
+        sandbox.stub(GameSchema, "findById").resolves(null);
+
+      });
+
+      afterEach(() => {
+        sandbox.restore();
+      });
+
+      it("should reslove null ", () => {
+        const game = GlobalDI.get<Game>("Game");
+        return gameDAO.getGameById("").then((res) => {
+          expect(res).to.be.equal(null);
+        });
+      });
+    });
+
+    describe("Test rainy case", () => {
+      let sandbox: any;
+      const gameDAO = GlobalDI.get<GameDAO>("GameDAO");
+
+      beforeEach(() => {
+        sandbox = sinon.sandbox.create();
+        sandbox.stub(GameSchema, "findById").rejects(new Error());
+
+      });
+
+      afterEach(() => {
+        sandbox.restore();
+      });
+
+      it("should reslove a object of type Game ", () => {
+        const game = GlobalDI.get<Game>("Game");
+        return gameDAO.getGameById("").catch((err) => {
+          expect(err).to.be.an.instanceof(Error);
+        });
+      });
+    });
+  });
 });
