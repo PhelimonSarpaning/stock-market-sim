@@ -47,4 +47,12 @@ router.get("/stock/details", (req: IRequest, res: Response, next: NextFunction) 
   gameController.getStockSectorMapping(req, res, next);
 });
 
+router.get("/sectors", (req: IRequest, res: Response, next: NextFunction) => {
+  gameController.getSectorList(req, res, next);
+});
+
+router.get("/sector/history", (req: IRequest, res: Response, next: NextFunction) => {
+  gameController.getSectorAverageForGame(req, res, next);
+});
+
 export { router };

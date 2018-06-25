@@ -115,7 +115,7 @@ export class GameService {
       }).catch((err) => {
         reject(err);
       });
-  });
+    });
   }
 
   public getAnalystTrends(gameId: string): Promise<Map<number, any>> {
@@ -189,7 +189,7 @@ export class GameService {
       }).catch((err) => {
         reject(err);
       });
-  });
+    });
   }
 
   public getStockPriceForCurrentRound(gameId: string): Promise<Stock[]> {
@@ -239,6 +239,64 @@ export class GameService {
         //   }
         // }
         resolve(game.sectorsCompanyMap);
+      }).catch((err) => {
+        reject(err);
+      });
+    });
+  }
+
+  public getSectorList(gameId: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.gameDAO.getGameById(gameId).then((game) => {
+        if (!game) {
+          reject(new Error("Game doesn't exist!"));
+        }
+        resolve(Object.keys(game.sectorsCompanyMap));
+      }).catch((err) => {
+        reject(err);
+      });
+    });
+  }
+
+  public getSectorAverageForGame(gameId: string, sector: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.gameDAO.getGameById(gameId).then((game) => {
+        if (!game) {
+          reject(new Error("Game doesn't exist!"));
+        }
+        const resObject = {};
+        const sectors = Object.keys(game.sectorsCompanyMap);
+        const roundsResult: any = {};
+        game.rounds.forEach((round) => {
+          let count = 0;
+          let sectorTotal = 0;
+          round.stock.forEach((stock) => {
+            if (stock.sector === sector && stock.round <= game.currentRound) {
+              sectorTotal += stock.price;
+              count++;
+            }
+          });
+          if (round.roundNo <= game.currentRound) {
+            roundsResult[String(round.roundNo)] = (sectorTotal / count);
+          }
+        });
+        // const sectorResult: any = {};
+        // sectors.forEach((sector) => {
+        //   const roundsResult: any = {};
+        //   game.rounds.forEach((round) => {
+        //     let count = 0;
+        //     let sectorTotal = 0;
+        //     round.stock.forEach((stock) => {
+        //       if (stock.sector === sector) {
+        //         sectorTotal += stock.price;
+        //         count++;
+        //       }
+        //     });
+        //     roundsResult[String(round.roundNo)] = (sectorTotal / count);
+        //   });
+        //   sectorResult[sector] = roundsResult;
+        // });
+        resolve(roundsResult);
       }).catch((err) => {
         reject(err);
       });
