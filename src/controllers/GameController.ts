@@ -23,7 +23,7 @@ export class GameController {
       res.status(200).json(result);
     }).catch((err) => {
       this.logger.error(err);
-      return res.status(500).json(err.message);
+      return res.status(500).json({ message: err.message });
     });
   }
 
@@ -42,9 +42,9 @@ export class GameController {
         roundNo: result.roundNo,
         stocks: result.stock,
       });
-    }).catch((err: Error) => {
-      this.logger.error(err.stack);
-      return res.status(500).json(err.message);
+    }).catch((err) => {
+      this.logger.error(err);
+      return res.status(500).json({ message: err.message });
     });
   }
 
@@ -68,7 +68,7 @@ export class GameController {
       res.status(200).json(resultArr);
     }).catch((err) => {
       this.logger.error(err);
-      return res.status(500).json(err.message);
+      return res.status(500).json({ message: err.message });
     });
   }
 
@@ -86,7 +86,7 @@ export class GameController {
       res.status(200).json(result);
     }).catch((err) => {
       this.logger.error(err);
-      return res.status(500).json(err.message);
+      return res.status(500).json({ message: err.message });
     });
   }
 
@@ -101,7 +101,7 @@ export class GameController {
       });
     }).catch((err) => {
       this.logger.error(err);
-      return res.status(500).json(err.message);
+      return res.status(500).json({ message: err.message });
     });
   }
 
@@ -117,7 +117,7 @@ export class GameController {
       res.status(200).json(stocks);
     }).catch((err) => {
       this.logger.error(err);
-      return res.status(500).json(err.message);
+      return res.status(500).json({ message: err.message });
     });
   }
 
@@ -138,7 +138,7 @@ export class GameController {
       res.status(200).json(resultObject);
     }).catch((err) => {
       this.logger.error(err);
-      return res.status(500).json(err.message);
+      return res.status(500).json({ message: err.message });
     });
   }
 
@@ -151,7 +151,7 @@ export class GameController {
       res.status(200).json(result);
     }).catch((err) => {
       this.logger.error(err);
-      return res.status(500).json(err.message);
+      return res.status(500).json({ message: err.message });
     });
   }
 }
