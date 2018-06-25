@@ -36,26 +36,28 @@ export class GameService {
     game.sectorsCompanyMap = stocksSectorMap;
     game.rounds = this.initializeGameSimulation(sectors, stocksSectorMap);
     game.name = gameName;
-    return this.gameDAO.save(game).then((newGame) => {
-      let resObj = null;
-      newGame.rounds.forEach((r) => {
-        if (r.roundNo === 0) {
-          resObj = {
-            currentRound: newGame.currentRound,
-            gameId: newGame.id,
-            name: newGame.name,
-            round: {
-              event: r.event,
-              roundNo: r.roundNo,
-              stocks: r.stock,
-            },
-          };
-          if (resObj.round.event) { delete resObj.round.event.value; }
-        }
+    return new Promise((resolve, reject) => {
+      this.gameDAO.save(game).then((newGame) => {
+        let resObj = null;
+        newGame.rounds.forEach((r) => {
+          if (r.roundNo === 0) {
+            resObj = {
+              currentRound: newGame.currentRound,
+              gameId: newGame.id,
+              name: newGame.name,
+              round: {
+                event: r.event,
+                roundNo: r.roundNo,
+                stocks: r.stock,
+              },
+            };
+            if (resObj.round.event) { delete resObj.round.event.value; }
+          }
+        });
+        resolve(resObj);
+      }).catch((err) => {
+        reject(err);
       });
-      return resObj;
-    }).catch((err) => {
-      return err;
     });
   }
 
@@ -66,23 +68,25 @@ export class GameService {
    * @rejects An error
    */
   public nextRound(gameId: string): Promise<Round> {
-    return this.gameDAO.getGameById(gameId).then((game) => {
-      if (!game) {
-        throw new Error("Game doesn't exist!");
-      }
-      let newRound: Round = null;
-      game.rounds.forEach((round) => {
-        if (round.roundNo === (game.currentRound + 1)) {
-          newRound = round;
+    return new Promise((resolve, reject) => {
+      this.gameDAO.getGameById(gameId).then((game) => {
+        if (!game) {
+          reject(new Error("Game doesn't exist!"));
         }
-      });
-      return this.gameDAO.updateGameRound(game.id, game.currentRound + 1).then((roundUpdated) => {
-        return newRound;
+        let newRound: Round = null;
+        game.rounds.forEach((round) => {
+          if (round.roundNo === (game.currentRound + 1)) {
+            newRound = round;
+          }
+        });
+        this.gameDAO.updateGameRound(game.id, game.currentRound + 1).then((roundUpdated) => {
+          resolve(newRound);
+        }).catch((err) => {
+          reject(err);
+        });
       }).catch((err) => {
-        return err;
+        reject(err);
       });
-    }).catch((err) => {
-      return err;
     });
   }
 
@@ -91,79 +95,83 @@ export class GameService {
    * @returns returns a roundNo,EventString Map containing the event details for future rounds
    */
   public getAnalystEvents(gameId: string): Promise<Map<number, any>> {
-    return this.gameDAO.getGameById(gameId).then((game) => {
-      if (!game) {
-        throw new Error("Game doesn't exist!");
-      }
-      const maxRounds = game.currentRound + 3;
-      const analystRounds: Round[] = [];
-      const roundEventsMap = new Map<number, any>();
-      game.rounds.forEach((round) => {
-        if (round.roundNo > game.currentRound && round.roundNo <= maxRounds) {
-          if (round.event) {
-            analystRounds.push(round);
-            roundEventsMap.set(round.roundNo, round.event);
-          }
+    return new Promise((resolve, reject) => {
+      this.gameDAO.getGameById(gameId).then((game) => {
+        if (!game) {
+          reject(new Error("Game doesn't exist!"));
         }
+        const maxRounds = game.currentRound + 3;
+        const analystRounds: Round[] = [];
+        const roundEventsMap = new Map<number, any>();
+        game.rounds.forEach((round) => {
+          if (round.roundNo > game.currentRound && round.roundNo <= maxRounds) {
+            if (round.event) {
+              analystRounds.push(round);
+              roundEventsMap.set(round.roundNo, round.event);
+            }
+          }
+        });
+        resolve(roundEventsMap);
+      }).catch((err) => {
+        reject(err);
       });
-      return roundEventsMap;
-    }).catch((err) => {
-      return err;
     });
   }
 
   public getAnalystTrends(gameId: string): Promise<Map<number, any>> {
-    return this.gameDAO.getGameById(gameId).then((game) => {
-      if (!game) {
-        throw new Error("Game doesn't exist!");
-      }
-      const maxRounds = game.currentRound + 10;
-      const analystRounds: Round[] = [];
-      const roundTrendsMap = new Map<number, any>();
-      let trendToDisplay: string;
-      const pick = this.probabilityService.pickFromDeck(["sector", "stock"]);
-      if (pick === "sector") {
-        const sectors = Object.keys(game.rounds[0].sectorTrends);
-        trendToDisplay = String(this.probabilityService.pickFromDeck(sectors));
-        game.rounds.forEach((round) => {
-          if (round.roundNo > game.currentRound && round.roundNo <= maxRounds) {
-            roundTrendsMap.set(round.roundNo, round.sectorTrends[trendToDisplay]);
-          }
+    return new Promise((resolve, reject) => {
+      this.gameDAO.getGameById(gameId).then((game) => {
+        if (!game) {
+          reject(new Error("Game doesn't exist!"));
+        }
+        const maxRounds = game.currentRound + 10;
+        const analystRounds: Round[] = [];
+        const roundTrendsMap = new Map<number, any>();
+        let trendToDisplay: string;
+        const pick = this.probabilityService.pickFromDeck(["sector", "stock"]);
+        if (pick === "sector") {
+          const sectors = Object.keys(game.rounds[0].sectorTrends);
+          trendToDisplay = String(this.probabilityService.pickFromDeck(sectors));
+          game.rounds.forEach((round) => {
+            if (round.roundNo > game.currentRound && round.roundNo <= maxRounds) {
+              roundTrendsMap.set(round.roundNo, round.sectorTrends[trendToDisplay]);
+            }
+          });
+        } else if (pick === "stock") {
+          const stocks: string[] = [];
+          game.rounds[0].stock.forEach((stock) => {
+            stocks.push(stock.company);
+          });
+          trendToDisplay = String(this.probabilityService.pickFromDeck(stocks));
+          game.rounds.forEach((round) => {
+            if (round.roundNo > game.currentRound && round.roundNo <= maxRounds) {
+              round.stock.forEach((stock) => {
+                if (stock.company === trendToDisplay) {
+                  roundTrendsMap.set(round.roundNo, stock.randomTrend);
+                }
+              });
+            }
+          });
+        }
+        const resultArr: any = [];
+        const stocksSectorMap = this.stockSectorMap(game.rounds[0].stock);
+        roundTrendsMap.forEach((val, key, map) => {
+          resultArr.push({
+            entity: trendToDisplay,
+            round: key,
+            sector: pick === "stock" ? stocksSectorMap.get(trendToDisplay) : undefined,
+            type: pick,
+            value: val,
+          });
         });
-      } else if (pick === "stock") {
-        const stocks: string[] = [];
-        game.rounds[0].stock.forEach((stock) => {
-          stocks.push(stock.company);
-        });
-        trendToDisplay = String(this.probabilityService.pickFromDeck(stocks));
-        game.rounds.forEach((round) => {
-          if (round.roundNo > game.currentRound && round.roundNo <= maxRounds) {
-            round.stock.forEach((stock) => {
-              if (stock.company === trendToDisplay) {
-                roundTrendsMap.set(round.roundNo, stock.randomTrend);
-              }
-            });
-          }
-        });
-      }
-      const resultArr: any = [];
-      const stocksSectorMap = this.stockSectorMap(game.rounds[0].stock);
-      roundTrendsMap.forEach((val, key, map) => {
-        resultArr.push({
-          entity: trendToDisplay,
-          round: key,
-          sector: pick === "stock" ? stocksSectorMap.get(trendToDisplay) : undefined,
-          type: pick,
-          value: val,
-        });
+        resolve(resultArr);
+        // return {
+        //   entity: trendToDisplay,
+        //   trends: roundTrends,
+        // };
+      }).catch((err) => {
+        reject(err);
       });
-      return resultArr;
-      // return {
-      //   entity: trendToDisplay,
-      //   trends: roundTrends,
-      // };
-    }).catch((err) => {
-      return err;
     });
   }
 
@@ -172,13 +180,15 @@ export class GameService {
    * @returns The current round of the game.
    */
   public getGameClock(gameId: string): Promise<number> {
-    return this.gameDAO.getGameById(gameId).then((game) => {
-      if (!game) {
-        throw new Error("Game doesn't exist!");
-      }
-      return game.currentRound;
-    }).catch((err) => {
-      return err;
+    return new Promise((resolve, reject) => {
+      this.gameDAO.getGameById(gameId).then((game) => {
+        if (!game) {
+          reject(new Error("Game doesn't exist!"));
+        }
+        resolve(game.currentRound);
+      }).catch((err) => {
+        reject(err);
+      });
     });
   }
 
@@ -196,38 +206,128 @@ export class GameService {
    * @returns Number, number Map storing the round and price of the stock at each round
    */
   public getStockPriceHisory(gameId: string, stockName: string): Promise<Map<number, number>> {
-    return this.gameDAO.getGameById(gameId).then((game) => {
-      if (!game) {
-        throw new Error("Game doesn't exist!");
-      }
-      const roundStockMap = new Map<number, number>();
-      game.rounds.forEach((round) => {
-        round.stock.forEach((stock) => {
-          if (stock.company === stockName && round.roundNo <= game.currentRound) {
-            roundStockMap.set(stock.round, stock.price);
-          }
+    return new Promise((resolve, reject) => {
+      this.gameDAO.getGameById(gameId).then((game) => {
+        if (!game) {
+          reject(new Error("Game doesn't exist!"));
+        }
+        const roundStockMap = new Map<number, number>();
+        game.rounds.forEach((round) => {
+          round.stock.forEach((stock) => {
+            if (stock.company === stockName && round.roundNo <= game.currentRound) {
+              roundStockMap.set(stock.round, stock.price);
+            }
+          });
         });
+        resolve(roundStockMap);
+      }).catch((err) => {
+        reject(err);
       });
-      return roundStockMap;
-    }).catch((err) => {
-      return err;
     });
   }
 
   public getStocksSectorMapping(gameId: string): Promise<any> {
-    return this.gameDAO.getGameById(gameId).then((game) => {
-      if (!game) {
-        throw new Error("Game doesn't exist!");
-      }
-      // const resultArr: any = [];
-      // for (const key in object) {
-      //   if (object.hasOwnProperty(key)) {
-      //     const element = object[key];
-      //   }
-      // }
-      return game.sectorsCompanyMap;
-    }).catch((err) => {
-      return err;
+    return new Promise((resolve, reject) => {
+      this.gameDAO.getGameById(gameId).then((game) => {
+        if (!game) {
+          reject(new Error("Game doesn't exist!"));
+        }
+        // const resultArr: any = [];
+        // for (const key in object) {
+        //   if (object.hasOwnProperty(key)) {
+        //     const element = object[key];
+        //   }
+        // }
+        resolve(game.sectorsCompanyMap);
+      }).catch((err) => {
+        reject(err);
+      });
+    });
+  }
+
+  public getSectorList(gameId: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.gameDAO.getGameById(gameId).then((game) => {
+        if (!game) {
+          reject(new Error("Game doesn't exist!"));
+        }
+        resolve(Object.keys(game.sectorsCompanyMap));
+      }).catch((err) => {
+        reject(err);
+      });
+    });
+  }
+
+  public getSectorAverageForGame(gameId: string, sector: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.gameDAO.getGameById(gameId).then((game) => {
+        if (!game) {
+          reject(new Error("Game doesn't exist!"));
+        }
+        const resObject = {};
+        const sectors = Object.keys(game.sectorsCompanyMap);
+        const roundsResult: any = {};
+        game.rounds.forEach((round) => {
+          let count = 0;
+          let sectorTotal = 0;
+          round.stock.forEach((stock) => {
+            if (stock.sector === sector && stock.round <= game.currentRound) {
+              sectorTotal += stock.price;
+              count++;
+            }
+          });
+          if (round.roundNo <= game.currentRound) {
+            roundsResult[String(round.roundNo)] = (sectorTotal / count);
+          }
+        });
+        // const sectorResult: any = {};
+        // sectors.forEach((sector) => {
+        //   const roundsResult: any = {};
+        //   game.rounds.forEach((round) => {
+        //     let count = 0;
+        //     let sectorTotal = 0;
+        //     round.stock.forEach((stock) => {
+        //       if (stock.sector === sector) {
+        //         sectorTotal += stock.price;
+        //         count++;
+        //       }
+        //     });
+        //     roundsResult[String(round.roundNo)] = (sectorTotal / count);
+        //   });
+        //   sectorResult[sector] = roundsResult;
+        // });
+        resolve(roundsResult);
+      }).catch((err) => {
+        reject(err);
+      });
+    });
+  }
+
+  public getMarketAverageForGame(gameId: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.gameDAO.getGameById(gameId).then((game) => {
+        if (!game) {
+          reject(new Error("Game doesn't exist!"));
+        }
+        const resObject = {};
+        const roundsResult: any = {};
+        game.rounds.forEach((round) => {
+          let count = 0;
+          let marketTotal = 0;
+          round.stock.forEach((stock) => {
+            if (stock.round <= game.currentRound) {
+              marketTotal += stock.price;
+              count++;
+            }
+          });
+          if (round.roundNo <= game.currentRound) {
+            roundsResult[String(round.roundNo)] = (marketTotal / count);
+          }
+        });
+        resolve(roundsResult);
+      }).catch((err) => {
+        reject(err);
+      });
     });
   }
 

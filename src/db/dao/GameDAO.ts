@@ -19,46 +19,52 @@ export class GameDAO {
   }
 
   public getGameById(id: string): Promise<Game> {
-    return GameSchema.findById(id).then((result) => {
-      if (result) {
-        return this.gameBuilder.buildFromSchema(result);
-      } else {
-        return null;
-      }
-    }).catch((err) => {
-      return err;
+    return new Promise((resolve, reject) => {
+      GameSchema.findById(id).then((result) => {
+        if (result) {
+          resolve(this.gameBuilder.buildFromSchema(result));
+        } else {
+          resolve(null);
+        }
+      }).catch((err) => {
+        reject(err);
+      });
     });
   }
 
   public updateGameRound(gameId: string, round: number) {
-    return GameSchema.updateOne({ _id: gameId}, {currentRound: round}).then((result) => {
-      if (result) {
-        return true;
-      } else {
-        throw new Error("Round didn't shift");
-      }
-    }).catch((err) => {
-      return err;
+    return new Promise((resolve, reject) => {
+      GameSchema.updateOne({ _id: gameId }, { currentRound: round }).then((result) => {
+        if (result) {
+          resolve(true);
+        } else {
+          reject(new Error("Round didn't shift"));
+        }
+      }).catch((err) => {
+        reject(err);
+      });
     });
   }
 
   public getCurrentRoundStock(gameId: string): Promise<Round> {
-    return GameSchema.findById(gameId).then((res) => {
-      let game: Game;
-      let currentRound: Round;
-      if (res) {
-         game = this.gameBuilder.buildFromSchema(res);
-         game.rounds.forEach((round) => {
-           if (round.roundNo === game.currentRound) {
+    return new Promise((resolve, reject) => {
+      GameSchema.findById(gameId).then((res) => {
+        let game: Game;
+        let currentRound: Round;
+        if (res) {
+          game = this.gameBuilder.buildFromSchema(res);
+          game.rounds.forEach((round) => {
+            if (round.roundNo === game.currentRound) {
               currentRound = round;
-           }
-         });
-         return currentRound;
-      } else {
-        throw new Error("Current round stock details not found");
-      }
-    }).catch((err) => {
-      return err;
+            }
+          });
+          resolve(currentRound);
+        } else {
+          reject(new Error("Current round stock details not found"));
+        }
+      }).catch((err) => {
+        reject(err);
+      });
     });
   }
 }
