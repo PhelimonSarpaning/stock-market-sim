@@ -303,6 +303,34 @@ export class GameService {
     });
   }
 
+  public getMarketAverageForGame(gameId: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.gameDAO.getGameById(gameId).then((game) => {
+        if (!game) {
+          reject(new Error("Game doesn't exist!"));
+        }
+        const resObject = {};
+        const roundsResult: any = {};
+        game.rounds.forEach((round) => {
+          let count = 0;
+          let marketTotal = 0;
+          round.stock.forEach((stock) => {
+            if (stock.round <= game.currentRound) {
+              marketTotal += stock.price;
+              count++;
+            }
+          });
+          if (round.roundNo <= game.currentRound) {
+            roundsResult[String(round.roundNo)] = (marketTotal / count);
+          }
+        });
+        resolve(roundsResult);
+      }).catch((err) => {
+        reject(err);
+      });
+    });
+  }
+
   private stockSectorMap(stocks: Stock[]) {
     const stocksSectorMap = new Map<string, string>();
     stocks.forEach((stock) => {

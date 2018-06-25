@@ -55,4 +55,8 @@ router.get("/sector/history", (req: IRequest, res: Response, next: NextFunction)
   gameController.getSectorAverageForGame(req, res, next);
 });
 
+router.get("/market/history", (req: IRequest, res: Response, next: NextFunction) => {
+  gameController.getMarketAverageForGame(req, res, next);
+});
+
 export { router };

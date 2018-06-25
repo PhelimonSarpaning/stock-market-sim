@@ -184,4 +184,17 @@ export class GameController {
       return res.status(500).json({ message: err.message });
     });
   }
+
+  public getMarketAverageForGame(req: IRequest, res: Response, next: NextFunction) {
+    const gameId = req.query.id;
+    if (!gameId) {
+      return res.status(400).json({ err: "Game ID not found" });
+    }
+    this.gameService.getMarketAverageForGame(gameId).then((result) => {
+      res.status(200).json(result);
+    }).catch((err) => {
+      this.logger.error(err);
+      return res.status(500).json({ message: err.message });
+    });
+  }
 }
