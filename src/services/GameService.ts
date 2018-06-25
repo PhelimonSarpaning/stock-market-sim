@@ -303,6 +303,53 @@ export class GameService {
     });
   }
 
+  public getAllSectorsAverageForGame(gameId: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.gameDAO.getGameById(gameId).then((game) => {
+        if (!game) {
+          reject(new Error("Game doesn't exist!"));
+        }
+        const resObject = {};
+        const sectors = Object.keys(game.sectorsCompanyMap);
+        // const roundsResult: any = {}
+        // game.rounds.forEach((round) => {
+        //   let count = 0;
+        //   let sectorTotal = 0;
+        //   round.stock.forEach((stock) => {
+        //     if (stock.sector === sector && stock.round <= game.currentRound) {
+        //       sectorTotal += stock.price;
+        //       count++;
+        //     }
+        //   });
+        //   if (round.roundNo <= game.currentRound) {
+        //     roundsResult[String(round.roundNo)] = (sectorTotal / count);
+        //   }
+        // });
+        const sectorResult: any = {};
+        sectors.forEach((sector) => {
+          const roundsResult: any = {};
+          game.rounds.forEach((round) => {
+            let count = 0;
+            let sectorTotal = 0;
+            round.stock.forEach((stock) => {
+              if (stock.sector === sector && stock.round <= game.currentRound) {
+                sectorTotal += stock.price;
+                count++;
+              }
+            });
+            if (round.roundNo <= game.currentRound) {
+              roundsResult[String(round.roundNo)] = (sectorTotal / count);
+            }
+          });
+          sectorResult[sector] = roundsResult;
+        });
+        resolve(sectorResult);
+      }).catch((err) => {
+        reject(err);
+      });
+    });
+  }
+
   public getMarketAverageForGame(gameId: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.gameDAO.getGameById(gameId).then((game) => {
